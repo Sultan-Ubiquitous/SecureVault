@@ -33,7 +33,9 @@ export async function createApp() {
       ? '*' 
       : [
           'https://secure-vault-web-two.vercel.app',
-          /\.vercel\.app$/, // Allow all Vercel preview deployments
+          /\.vercel\.app$/,
+          'https://secure-vault-2fmts4m4a-sultan-ubiquitous-projects.vercel.app'
+           // Allow all Vercel preview deployments
         ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
