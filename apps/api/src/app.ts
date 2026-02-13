@@ -28,18 +28,11 @@ export async function createApp() {
 
   // Security plugins
   await fastify.register(helmet);
-  await fastify.register(cors, {
-    origin: env.NODE_ENV === 'development' 
-      ? '*' 
-      : [
-          'https://secure-vault-web-two.vercel.app',
-          /\.vercel\.app$/,
-          'https://secure-vault-2fmts4m4a-sultan-ubiquitous-projects.vercel.app'
-           // Allow all Vercel preview deployments
-        ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  });
+ await fastify.register(cors, {
+  origin: '*',
+  credentials: false,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+});
 
   // Initialize dependencies
   const storage = StorageFactory.create();
