@@ -1,135 +1,66 @@
-# Turborepo starter
+# Secure Transaction Vault
 
-This Turborepo starter is maintained by the Turborepo core team.
+**Enterprise-Grade Secure Data Storage System**
 
-## Using this example
+A full-stack monorepo application designed to demonstrate a high-assurance **Envelope Encryption** architecture. This system allows users to securely encrypt, store, and retrieve sensitive transaction payloads, ensuring that data at rest is cryptographically isolated from the keys used to protect it.
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
-```
+## 🏗 System Architecture
 
-## What's inside?
+The project is structured as a **Turborepo** monorepo, enforcing strict boundary separation between the user interface, the API gateway, and the core cryptographic logic.
 
-This Turborepo includes the following packages/apps:
 
-### Apps and Packages
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### 1. Frontend (`apps/web`)
+* **Framework:** **Next.js** (React)
+* **Role:** The user-facing dashboard. It provides a clean, responsive interface for inputting sensitive JSON payloads, viewing encrypted records (ciphertext), and requesting decryption.
+* **Key Features:**
+    * Real-time interaction with the API.
+    * Visualizes the "before" (plaintext) and "after" (ciphertext) states.
+    * Error handling for tampered data.
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### 2. Backend API (`apps/api`)
+* **Framework:** **Fastify** (Node.js)
+* **Role:** The high-performance REST gateway. It orchestrates the encryption lifecycle and manages persistence.
+* **Design:** Layered Architecture (Controller -> Service -> Storage).
+* **Storage Strategy:** Configurable via **Adapter Pattern**.
+    * **Development:** In-Memory `Map` (Zero setup).
+    * **Production:** **PostgreSQL** via **Prisma ORM**.
 
-### Utilities
+### 3. Core Security Library (`packages/crypto`)
+* **Role:** The isolated "brain" of the operation. This package contains *all* cryptographic primitives and validation logic.
+* **Algorithm:** **AES-256-GCM** (Authenticated Encryption).
+* **Why Shared?** By isolating crypto logic in a shared package, we ensure consistent security standards across any future services or microservices that join the repo.
 
-This Turborepo has some additional tools already setup for you:
+---
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## 🔐 Security Deep Dive: Envelope Encryption
 
-### Build
+This project implements the industry-standard **Envelope Encryption** pattern to solve the "Key Management Problem."
 
-To build all apps and packages, run the following command:
+1.  **Data Encryption Key (DEK):** Every single transaction generates a *brand new* random 256-bit key. The payload is encrypted with this key.
+2.  **Key Wrapping:** The DEK itself is then encrypted ("wrapped") using the persistent **Master Key**.
+3.  **Storage:** The database stores:
+    * The Encrypted Payload
+    * The Encrypted DEK
+    * **ZERO** plaintext keys.
+4.  **Decryption:** To read data, the system must first unwrap the DEK using the Master Key, then use the DEK to decrypt the payload.
 
-```
-cd my-turborepo
+> **Benefit:** If the database is leaked, the attacker sees only ciphertext. They cannot decrypt anything without the Master Key, which is held separately in the application environment.
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+---
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+## 🚀 Quick Start Guide
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+**Prerequisites:** Node.js 20+, pnpm.
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+```bash
+# 1. Install dependencies across the monorepo
+pnpm install
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+# 2. Setup environment (if using Prisma/DB)
+# Copy .env.example to .env in apps/api
 
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+# 3. Start the entire stack (Frontend + Backend)
+pnpm dev
