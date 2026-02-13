@@ -29,7 +29,14 @@ export async function createApp() {
   // Security plugins
   await fastify.register(helmet);
   await fastify.register(cors, {
-    origin: env.NODE_ENV === 'development' ? '*' : '*',
+    origin: env.NODE_ENV === 'development' 
+      ? '*' 
+      : [
+          'https://secure-vault-web-two.vercel.app',
+          /\.vercel\.app$/, // Allow all Vercel preview deployments
+        ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   });
 
   // Initialize dependencies
