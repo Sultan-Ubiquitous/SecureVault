@@ -1,0 +1,32 @@
+{
+  "name": "@repo/crypto",
+  "version": "1.0.0",
+  "description": "Cryptographic utilities for secure envelope encryption",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
+    "test:coverage": "vitest run --coverage --config vitest.config.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20.19.33",
+    "@vitest/coverage-v8": "^1.2.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

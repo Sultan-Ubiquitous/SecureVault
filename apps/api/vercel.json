@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "installCommand": "pnpm install --filter=api...",
+  "buildCommand": "pnpm turbo build --filter=api...",
+  "framework": null,
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.ts"
+    }
+  ]
+}
