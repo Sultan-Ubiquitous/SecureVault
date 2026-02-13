@@ -24,11 +24,7 @@ export async function createApp() {
 
   // Security plugins
   await fastify.register(helmet);
- await fastify.register(cors, {
-  origin: '*',
-  credentials: false,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-});
+
 
   // Initialize dependencies
   const storage = StorageFactory.create();
