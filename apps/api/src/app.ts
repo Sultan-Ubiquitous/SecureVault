@@ -20,11 +20,7 @@ import type { ErrorResponse } from './types/api.types.js';
  * Create and configure Fastify application
  */
 export async function createApp() {
-  const fastify = Fastify({
-    logger: {
-      level: env.NODE_ENV === 'development' ? 'info' : 'warn',
-    },
-  });
+  const fastify = Fastify();
 
   // Security plugins
   await fastify.register(helmet);
